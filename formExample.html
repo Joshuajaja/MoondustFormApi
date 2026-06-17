@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+    <form onsubmit="senddata(); return false;">
+  <label for="mcUser">mc4user:</label><br>
+  <input type="text" id="mcUser" name="mcUser" value="John"><br>
+  <label for="dcUser">disco2rduser:</label><br>
+  <input type="text" id="dcUser" name="dcUser" value="JohnDiscord">
+  <label for="description">descdription:</label><br>
+  <input type="text" id="description" name="description" value="Im John">
+  <input type="submit" value="Submit">
+</form>
+
+</body>
+<script>
+    async function senddata(){
+        let UserVar = String(document.getElementById("mcUser").value);
+        let DiscordVar = String(document.getElementById("dcUser").value);
+        let DescriptionVar = String(document.getElementById("description").value);
+
+        const response = await fetch(`http://127.0.0.1:8000/TinySurvival?mcUser=${UserVar}&dcUser=${DiscordVar}&description=${DescriptionVar}`, 
+        {
+            method: "POST"
+        });
+    }
+</script>
+</html>
