@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 
-WEBHOOK_URL = "https://discordapp.com/api/webhooks/1516574621577646200/1wS2jWUKZ_gB50b2mLfITXJ-tfGE4TVN9EbK7apvbs9ULmc9op5omhJ3pWTSlMzGRtD_"
+WEBHOOK_URL = "https://discordapp.com/api/webhooks/1516892408305029161/LCUST8Rh_dndrN9uat0M_CSTWVR_WcClUpbVMJLddY4QMnB09RqUojNCLIEjDozIqFEP"
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,8 +16,20 @@ app.add_middleware(
 
 @app.post("/CreativePlots")
 async def submit_CreativePlots(mcUser: str, dcUser: str, description: str):
-        discordMessage = {"content": f"CreativePlots Form Submission:\nMinecraft Username: {mcUser}\nDiscord Username: {dcUser}\nDescription: {description}"}
-
+        discordMessage = {
+              "embeds": [
+                {
+                "author": {"name": "Form Submission"},
+                  "title": "Creative Plots Form Submission",
+                  "color":  9983179,
+                  "fields": [
+                    {"name": "Minecraft Username", "value": mcUser, "inline": False},
+                    {"name": "Discord Username", "value": dcUser, "inline": False},
+                    {"name": "Describe who you are and what makes you interested in Creative plots!", "value": description, "inline": False}
+                  ]
+                }
+              ]
+        }
         async with httpx.AsyncClient() as client:
             r = await client.post(WEBHOOK_URL, json=discordMessage)
             
@@ -25,7 +37,20 @@ async def submit_CreativePlots(mcUser: str, dcUser: str, description: str):
                 "discord_status_code": r.status_code}
 @app.post("/TinySurvival")
 async def submit_TinySurvival(mcUser: str, dcUser: str, description: str):
-        discordMessage = {"content": f"TinySurvival Form Submission:\nMinecraft Username: {mcUser}\nDiscord Username: {dcUser}\nDescription: {description}"}
+        discordMessage = {
+              "embeds": [
+                {
+                "author": {"name": "Form Submission"},
+                  "title": "TinySurvival Form Submission",
+                  "color":  9983179,
+                  "fields": [
+                    {"name": "Minecraft Username", "value": mcUser, "inline": False},
+                    {"name": "Discord Username", "value": dcUser, "inline": False},
+                    {"name": "Describe who you are and what makes you interested in Tiny Survival!", "value": description, "inline": False}
+                  ]
+                }
+              ]
+        }
 
         async with httpx.AsyncClient() as client:
             r = await client.post(WEBHOOK_URL, json=discordMessage)
