@@ -7,7 +7,7 @@ app = FastAPI()
 
 WEBHOOK_URL = "https://discordapp.com/api/webhooks/1516892408305029161/LCUST8Rh_dndrN9uat0M_CSTWVR_WcClUpbVMJLddY4QMnB09RqUojNCLIEjDozIqFEP"
 
-app.add_middleware(
+app.add_middleware( # allow all requests
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 @app.post("/CreativePlots")
-async def submit_CreativePlots(mcUser: str, dcUser: str, description: str):
+async def submit_CreativePlots(mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
         discordMessage = {
               "embeds": [
                 {
@@ -31,12 +31,12 @@ async def submit_CreativePlots(mcUser: str, dcUser: str, description: str):
               ]
         }
         async with httpx.AsyncClient() as client:
-            r = await client.post(WEBHOOK_URL, json=discordMessage)
+            r = await client.post(WEBHOOK_URL, json=discordMessage) # send message to discord webhook
             
         return {"message": "Form submitted successfully", "data": {"mcUser": mcUser, "dcUser": dcUser, "description": description},
-                "discord_status_code": r.status_code}
+                "discord_status_code": r.status_code} #api response
 @app.post("/TinySurvival")
-async def submit_TinySurvival(mcUser: str, dcUser: str, description: str):
+async def submit_TinySurvival(mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
         discordMessage = {
               "embeds": [
                 {
@@ -53,8 +53,8 @@ async def submit_TinySurvival(mcUser: str, dcUser: str, description: str):
         }
 
         async with httpx.AsyncClient() as client:
-            r = await client.post(WEBHOOK_URL, json=discordMessage)
+            r = await client.post(WEBHOOK_URL, json=discordMessage) # send discord message to webhook
         
         return {"message": "Form submitted successfully", "data": {"mcUser": mcUser, "dcUser": dcUser, "description": description},
-                "discord_status_code": r.status_code}
+                "discord_status_code": r.status_code} #api response
 
