@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 import httpx
 from fastapi.middleware.cors import CORSMiddleware 
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -25,7 +25,7 @@ app.add_middleware( # allow only form submissions
 )
 
 @app.post("/submit")
-@limiter.limit("15/minute") # limit to 5 requests per minute per ip address
+@limiter.limit("20/minute") # limit to 5 requests per minute per ip address
 async def submit(request: Request, type: str, username: str, handle: str, description: str):
 	discordMessages = {
 		"creativePlots":{
@@ -69,8 +69,10 @@ async def submit(request: Request, type: str, username: str, handle: str, descri
     }
   }
 
-	if discordMessages[type] != None:
+	if type in discordMessages:
 		async with httpx.AsyncClient() as client:
 			r = await client.post(WEBHOOK_URL, json=discordMessages[type]) # send message to discord webhook
 			return {"message": "Form submitted successfully", "data": {"username": username, "handle": handle, "description": description}, "discord_status_code": r.status_code} #api response
+	else:
+		raise HTTPException(status_code=400, detail="Invalid form type")
 
