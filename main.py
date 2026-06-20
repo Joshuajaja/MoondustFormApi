@@ -17,76 +17,60 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) #type
 
 WEBHOOK_URL = os.environ["API_KEY"] # get webhook url from environment variable
 
-app.add_middleware( # allow all requests
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+app.add_middleware( # allow only form submissions
+		CORSMiddleware,
+		allow_origins=["*"],
+		allow_methods=["*"],
+		allow_headers=["*"],
 )
 
-@app.post("/CreativePlots")
-@limiter.limit("5/minute") # limit to 5 requests per minute
-async def submit_CreativePlots(request: Request, mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
-        discordMessage = {
-              "embeds": [
-                {
-                "author": {"name": "Form Submission"},
-                  "title": "Creative Plots Form Submission",
-                  "color":  9983179,
-                  "fields": [
-                    {"name": "Minecraft Username", "value": mcUser, "inline": False},
-                    {"name": "Discord Username", "value": dcUser, "inline": False},
-                    {"name": "Describe who you are and what makes you interested in Creative plots!", "value": description, "inline": False}
-                  ]
-                }
-              ]
+@app.post("/submit")
+@limiter.limit("5/minute") # limit to 5 requests per minute per ip address
+async def submit(request: Request, type: str, username: str, handle: str, description: str):
+	discordMessages = {
+		"creativePlots":{
+			"embeds": [
+				{
+					"author": {"name": "Form Submission"},
+					"title": "Creative Plots Form Submission",
+					"color":  9983179,
+					"fields": [
+						{"name": "Minecraft Username", "value": username, "inline": False},
+						{"name": "Discord Username", "value": handle, "inline": False},
+						{"name": "Describe who you are and what makes you interested in Creative plots!", "value": description, "inline": False}
+					]
+				}
+			]
+		},
+		"tinySurvival":{
+			  "embeds": [
+				{
+					"author": {"name": "Form Submission"},
+					"title": "TinySurvival Form Submission",
+					"color":  9983179,
+					"fields": [
+						{"name": "Minecraft Username", "value": username, "inline": False},
+						{"name": "Discord Username", "value": handle, "inline": False},
+						{"name": "Describe who you are and what makes you interested in Tiny Survival!", "value": description, "inline": False}
+					]
+				}
+			]
+		},
+		"buildComp":{
+        "embeds": [
+        {
+          "author": {"name": "Form Submission"},
+          "title": "Build Comp Form Submission",
+          "color":  9983179,
+          "fields": [
+            {"name": "Minecraft Username(s)", "value": username, "inline": False}]
         }
-        async with httpx.AsyncClient() as client:
-            r = await client.post(WEBHOOK_URL, json=discordMessage) # send message to discord webhook
-            
-        return {"message": "Form submitted successfully", "data": {"mcUser": mcUser, "dcUser": dcUser, "description": description},
-                "discord_status_code": r.status_code} #api response
-@app.post("/TinySurvival")
-@limiter.limit("5/minute") # limit to 5 requests per minute
-async def submit_TinySurvival(request: Request, mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
-        discordMessage = {
-              "embeds": [
-                {
-                "author": {"name": "Form Submission"},
-                  "title": "TinySurvival Form Submission",
-                  "color":  9983179,
-                  "fields": [
-                    {"name": "Minecraft Username", "value": mcUser, "inline": False},
-                    {"name": "Discord Username", "value": dcUser, "inline": False},
-                    {"name": "Describe who you are and what makes you interested in Tiny Survival!", "value": description, "inline": False}
-                  ]
-                }
-              ]
-        }
+        ]
+    }
+  }
 
-        async with httpx.AsyncClient() as client:
-            r = await client.post(WEBHOOK_URL, json=discordMessage) # send discord message to webhook
-        
-        return {"message": "Form submitted successfully", "data": {"mcUser": mcUser, "dcUser": dcUser, "description": description},
-                "discord_status_code": r.status_code} #api response
-@app.post("/BuildComp")
-@limiter.limit("5/minute") # limit to 5 requests per minute
-async def submit_BuildComp(request: Request, mcUser: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
-        discordMessage = {
-              "embeds": [
-                {
-                "author": {"name": "Form Submission"},
-                  "title": "Build Competition Form Submission",
-                  "color":  9983179,
-                  "fields": [
-                    {"name": "Minecraft Username(s)", "value": mcUser, "inline": False},
-                  ]
-                }
-              ]
-        }
-        async with httpx.AsyncClient() as client:
-            r = await client.post(WEBHOOK_URL, json=discordMessage) # send message to discord webhook
-            
-        return {"message": "Form submitted successfully", "data": {"mcUser": mcUser},
-                "discord_status_code": r.status_code} #api response
+	if discordMessages[type] != None:
+		async with httpx.AsyncClient() as client:
+			r = await client.post(WEBHOOK_URL, json=discordMessages[type]) # send message to discord webhook
+			return {"message": "Form submitted successfully", "data": {"username": username, "handle": handle, "description": description}, "discord_status_code": r.status_code} #api response
 
