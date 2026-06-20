@@ -25,7 +25,7 @@ app.add_middleware( # allow only form submissions
 )
 
 @app.post("/submit")
-@limiter.limit("5/minute") # limit to 5 requests per minute per ip address
+@limiter.limit("15/minute") # limit to 5 requests per minute per ip address
 async def submit(request: Request, type: str, username: str, handle: str, description: str):
 	discordMessages = {
 		"creativePlots":{
