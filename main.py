@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+import os
+from dotenv import load_dotenv
+
+load_dotenv() # get secrets from .env file
 
 limiter = Limiter(key_func=get_remote_address) #limit per ip address
 app = FastAPI()
@@ -11,7 +15,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) #type: ignore
 
 
-WEBHOOK_URL = "https://discordapp.com/api/webhooks/1516892408305029161/LCUST8Rh_dndrN9uat0M_CSTWVR_WcClUpbVMJLddY4QMnB09RqUojNCLIEjDozIqFEP"
+WEBHOOK_URL = os.environ["API_KEY"] # get webhook url from environment variable
 
 app.add_middleware( # allow all requests
     CORSMiddleware,
