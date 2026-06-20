@@ -20,8 +20,8 @@ WEBHOOK_URL = os.environ["API_KEY"] # get webhook url from environment variable
 app.add_middleware( # allow only form submissions
 		CORSMiddleware,
 		allow_origins=["*"],
-		allow_methods=["*"],
-		allow_headers=["*"],
+		allow_methods=["POST"],
+		allow_headers=["MOONDUST_FORM_SUBMISSION"],
 )
 
 @app.post("/submit")
