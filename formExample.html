@@ -20,6 +20,12 @@
   <label for="description">descdription:</label><br>
   <input type="text" id="description" name="description" value="Im John">
   <input type="submit" value="Submit">
+
+</form>
+    <form onsubmit="senddataBuildComp(); return false;">
+  <label for="mcUser">mcuser:</label><br>
+  <input type="text" id="mcUser" name="mcUser" value="John"><br>
+  <input type="submit" value="Submit">
 </form>
 
 </body>
@@ -33,6 +39,9 @@
         {
             method: "POST"
         });
+        if(response.status == 429){
+            alert("You have been rate limited, please wait before submitting again.");
+        }
     }
 
     async function senddataCreativePlots(){
@@ -44,6 +53,19 @@
         {
             method: "POST"
         });
+        if(response.status == 429){
+            alert("You have been rate limited, please wait before submitting again.");
+        }
+    }
+        async function senddataBuildComp(){
+        let UserVar = String(document.getElementById("mcUser").value);
+        const response = await fetch(`http://127.0.0.1:8000/BuildComp?mcUser=${UserVar}`, 
+        {
+            method: "POST"
+        });
+        if(response.status == 429){
+            alert("You have been rate limited, please wait before submitting again.");
+        }
     }
 </script>
 </html>

@@ -1,8 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import httpx
 from fastapi.middleware.cors import CORSMiddleware 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) #type
 
 
 WEBHOOK_URL = "https://discordapp.com/api/webhooks/1516892408305029161/LCUST8Rh_dndrN9uat0M_CSTWVR_WcClUpbVMJLddY4QMnB09RqUojNCLIEjDozIqFEP"
@@ -15,7 +21,8 @@ app.add_middleware( # allow all requests
 )
 
 @app.post("/CreativePlots")
-async def submit_CreativePlots(mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
+@limiter.limit("5/minute") # limit to 5 requests per minute
+async def submit_CreativePlots(request: Request, mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
         discordMessage = {
               "embeds": [
                 {
@@ -36,7 +43,8 @@ async def submit_CreativePlots(mcUser: str, dcUser: str, description: str): # do
         return {"message": "Form submitted successfully", "data": {"mcUser": mcUser, "dcUser": dcUser, "description": description},
                 "discord_status_code": r.status_code} #api response
 @app.post("/TinySurvival")
-async def submit_TinySurvival(mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
+@limiter.limit("5/minute") # limit to 5 requests per minute
+async def submit_TinySurvival(request: Request, mcUser: str, dcUser: str, description: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
         discordMessage = {
               "embeds": [
                 {
@@ -56,5 +64,25 @@ async def submit_TinySurvival(mcUser: str, dcUser: str, description: str): # don
             r = await client.post(WEBHOOK_URL, json=discordMessage) # send discord message to webhook
         
         return {"message": "Form submitted successfully", "data": {"mcUser": mcUser, "dcUser": dcUser, "description": description},
+                "discord_status_code": r.status_code} #api response
+@app.post("/BuildComp")
+@limiter.limit("5/minute") # limit to 5 requests per minute
+async def submit_BuildComp(request: Request, mcUser: str): # dont change these names, api gets its input via a link that has these names in it, if you change them the api will break
+        discordMessage = {
+              "embeds": [
+                {
+                "author": {"name": "Form Submission"},
+                  "title": "Build Competition Form Submission",
+                  "color":  9983179,
+                  "fields": [
+                    {"name": "Minecraft Username(s)", "value": mcUser, "inline": False},
+                  ]
+                }
+              ]
+        }
+        async with httpx.AsyncClient() as client:
+            r = await client.post(WEBHOOK_URL, json=discordMessage) # send message to discord webhook
+            
+        return {"message": "Form submitted successfully", "data": {"mcUser": mcUser},
                 "discord_status_code": r.status_code} #api response
 
