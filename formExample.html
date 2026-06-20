@@ -2,10 +2,11 @@
 <html>
 <head>
 	<script>
-	async function submitForm(type){
-		const User = String(document.getElementById("username").value);
-		const Discord = String(document.getElementById("handle").value);
-		const Description = String(document.getElementById("description").value);
+	async function submitForm(type, form){
+        const formData = new FormData(form);
+		const User = String(formData.get("username"));
+		const Discord = String(formData.get("handle"));
+		const Description = String(formData.get("description"));
 
 		const response = await fetch(`http://127.0.0.1:8000/submit?type=${type}&username=${User}&handle=${Discord}&description=${Description}`, {
 			method: "POST",
@@ -18,7 +19,7 @@
 </script>
 </head>
 <body>
-	<form onsubmit="submitForm('creativePlots'); return false;">
+	<form id="creativePlotsForm" onsubmit="submitForm('creativePlots', this); return false;">
 		<label for="username">Minecraft Username</label><br>
 		<input type="text" id="username" name="username" value="John"><br>
 		<label for="handle">Discord Username</label><br>
@@ -27,7 +28,7 @@
 		<input type="text" id="description" name="description" value="Im John"><br>
 		<input type="submit" value="Submit">
 	</form><br><br>
-	<form onsubmit="submitForm('tinySurvival'); return false;">
+	<form id="tinySurvivalForm" onsubmit="submitForm('tinySurvival', this); return false;">
 		<label for="username">Minecraft Username</label><br>
 		<input type="text" id="username" name="username" value="John"><br>
 		<label for="handle">Discord Username</label><br>
@@ -36,7 +37,7 @@
 		<input type="text" id="description" name="description" value="Im John"><br>
 		<input type="submit" value="Submit">
 	</form>
-    	<form onsubmit="submitForm('buildComp'); return false;">
+    	<form id="buildCompForm" onsubmit="submitForm('buildComp', this); return false;">
 		<label for="username">Minecraft Username</label><br>
 		<input type="text" id="username" name="username" value="John"><br>
         <input type="submit" value="Submit">
